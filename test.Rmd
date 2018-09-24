@@ -1,0 +1,19 @@
+---
+title: "activity1"
+author: "Yi Li"
+date: "9/20/2018"
+output: html_document
+---
+
+```{r}
+install.packages("tidyverse")
+install.packages("dplyr")
+library(tidyr)
+library(dplyr)
+DF1 <- read.csv("swirl-data.csv", header = TRUE)
+DF2 <- select(DF1, one_of(c("hash", "lesson_name", "attempt")))
+View(DF2)
+DF3 <- DF2 %>% group_by(hash, lesson_name) %>% summarise(sum(attempt))
+View(DF3)
+```
+
