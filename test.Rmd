@@ -10,10 +10,65 @@ install.packages("tidyverse")
 install.packages("dplyr")
 library(tidyr)
 library(dplyr)
+
 DF1 <- read.csv("swirl-data.csv", header = TRUE)
+
 DF2 <- select(DF1, one_of(c("hash", "lesson_name", "attempt")))
 View(DF2)
-DF3 <- DF2 %>% group_by(hash, lesson_name) %>% summarise(sum(attempt))
+
+#  create a data frame that sums all the attempts for each hash by each    lesson_name called DF3
+#  %>% is a chain. interprete it as "then"
+DF3 <- DF2 %>% 
+  group_by(hash, lesson_name) %>% 
+  summarise(sum_attempt = sum(attempt))
 View(DF3)
+
+# DF3 would look like if all the lesson names were column names
+testDF3 <- DF3 %>% spread(lesson_name, sum_attempt)
+View(testDF3)
+
+# Create a new data frame from DF1 called DF4 that only includes the variables hash and correct
+DF4 <- select(DF1, one_of(c("hash", "correct")))
+View(DF4)
+
+# Convert the correct variable so that TRUE is coded as the number 1 and FALSE is coded as 0
+
+# Wrong. It returns a single interger column
+# DF4_convert = as.integer(as.logical(DF4$correct))
+
+# Wrong.  can't apply "+" to factors.
+# transmute(DF4, correct = correct + 1)
+
+# Yeah!
+DF4$correct = as.integer(as.logical(DF4$correct))
+# DF4$correct = as.logical(DF4$correct)
+# DF4$correct = as.numeric(DF4$correct)
+View(DF4)
+
+# Create a new data frame that called DF4 that provides a mean score for each student
+
+# Bug 1
+# DF4_1 <- group_by(DF4, hash)
+
+# Bug 2
+# DF4_1 <- DF4 %>% 
+#   summarise(DF4, avg = mean(correct))
+
+# Bug 3  
+# DF4 %>% 
+#   group_by(hash) %>% 
+#   summarise(avg_correct = mean(correct, na.rm = TRUE))
+
+# Yeah!
+DF4_1 <- DF4 %>% 
+  group_by(hash) %>% 
+  summarise(avg_correct = mean(correct, na.rm = TRUE))
+View(DF4_1)
+
+# Extra credit Convert the datetime variable into month-day-year format and create a new data frame (DF5) that shows the average correct for each day
+swirl_data[["New_date"]] <- 
+  as.POSIXct(swirl_data[["datetime"]] * (60*60*24)
+    , origin="1899-12-30"
+    , tz="GMT")
 ```
 
